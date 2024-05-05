@@ -53,11 +53,11 @@ About the install of scopes using the library, this library requires manually in
 
 # Usage
 
-<a name="appscript"></a>
+<a name="appsscript"></a>
 
-## User appscript.json:
+## User appsscript.json:
 
-appscript file, json:
+appsscript file, json:
 ```json
 {
   "timeZone": "Europe/Moscow",
