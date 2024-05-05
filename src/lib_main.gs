@@ -322,11 +322,11 @@ function IO_AddNewFile(fromFileName, toFileName, templateScriptId) {
 
   let result = false;
   var receiverData = {};
+  const user_file_name = toFileName || fromFileName;
 
   try {
     // New project (user) file of the SCRIPT which will be modified
     const user_script_id = ScriptApp.getScriptId();
-    const user_file_name = toFileName || fromFileName;
 
     // Template data file
     const source_script_id = templateScriptId || getRemoteScriptId_() || '';
