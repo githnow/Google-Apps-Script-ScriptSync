@@ -1,5 +1,5 @@
 /**
- * @name Updater
+ * @name ScriptSync
  * @version 1.0
  * @description This script performs an update, 
  * adding new files from the template project 
