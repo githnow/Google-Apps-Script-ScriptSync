@@ -75,7 +75,7 @@ appsscript file, json:
       {
         "userSymbol": "ScriptSync",
         "libraryId": "1nUiajCHQReVwWPq7rNAvsIcWvPptmMUSzeytnzVHDpdoxUIvuX0e_reL",
-        "version": "2"
+        "version": "3"
       }
     ]
   },
