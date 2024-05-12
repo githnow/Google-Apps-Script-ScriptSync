@@ -1,8 +1,10 @@
 function deploy() {
-  const filesToCopy = ["lib_common", "lib_main", "lib_sett", "lib_types"];
+  const script_id = "my_template_script_id";
+  const updater = ScriptSync.assignTemplate(script_id);
+  const filesToCopy = ["my_code", "my_index", "my_json"];
 
   for (let file of filesToCopy) {
-    const res = ScriptSync.IO_AddNewFile(file); 
-    if (!res) break;
+    updater.AddNewFile(file);
   }
+  updater.commit();
 }
