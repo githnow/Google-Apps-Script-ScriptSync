@@ -179,8 +179,8 @@ If you have any questions and commissions for me, feel free to tell me.
 
   1. Completely rewritten the library code based on classes.
   2. Added new methods:
-     - General class methods: 4 methods of [assignTemplate](#methods_class), [commit](#methods_class), [drop](#methods_class), [viewChanges](#methods_class), [getChanges](#methods_class) and [getTemplateId](#methods_class) were added.
-     - File operations: 8 methods of [getScriptContent](#methods_class), [AddNewFile](#methods_class), [renameFile](#methods_class), [createBlankFile](#methods_class), [setCustomSource](#methods_class) and [addFileToUserJson](#methods_class) were added.
+     - General class methods: 6 methods of [assignTemplate](#methods_class), [commit](#methods_class), [drop](#methods_class), [viewChanges](#methods_class), [getChanges](#methods_class) and [getTemplateId](#methods_class) were added.
+     - File operations: 5 methods of [AddNewFile](#methods_class), [renameFile](#methods_class), [createBlankFile](#methods_class), [setCustomSource](#methods_class) and [addFileToUserJson](#methods_class) were added.
      - [IO_GetSamples](#methods) method.
 
 - v1.0.0 (May 5, 2024)
