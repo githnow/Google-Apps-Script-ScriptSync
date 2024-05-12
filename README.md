@@ -29,6 +29,7 @@ In order to use this library, please install this library.
 
 1. [Install library](https://developers.google.com/apps-script/guides/libraries).
    - Library's project key is **`1nUiajCHQReVwWPq7rNAvsIcWvPptmMUSzeytnzVHDpdoxUIvuX0e_reL`**.
+1. Copy the dependencies of the Apps Script ([appsscript.json](#appsscript)).
 
 ## About scopes
 
@@ -43,13 +44,41 @@ About the install of scopes using the library, this library requires manually in
 
 # Methods
 
-| Method                                       | Description                                                                                                                                                                                                                                                                                                                                           |
+<a name="methods"></a>
+
+## Libarary
+
+| Method                                       | Description                                                                                                                                       |
 | :------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-| getScriptContent                             | Allows fetching the content of a script file based on its script_id.                                                                              |
-| IO_GetScriptFiles                            | Retrieves a list of files associated with a script based on its script_id.                                                                        |
-| IO_GetTemplateScriptFiles                    | Fetches a list of template files (script_id of the template is defined in the script properties; default template id is set to the library's id). |
-| IO_UpdateFile                                | Updates an existing file within the script.                                                                                                       |
-| IO_AddNewFile                                | Adds a new file or replaces an existing one within the script.                                                                                    |
+| **IO_GetSamples** *                          | Saves file with code examples in the user script.                                                                                                 |
+| getScriptContent                             | Retrieves the content of the script file.                                                                                                         |
+| getScriptFiles                               | Retrieves a list of files associated with a script based on its script_id.                                                                        |
+| getTemplateScriptFiles                       | Fetches a list of template files (script_id of the template is defined in the script properties, default template id is set to the library's id). |
+| assignTemplate                               | Initializes the class and sets the ID of the template script as the data source.                                                                  |
+
+\* - makes changes the script file
+
+<a name="methods_class"></a>
+
+## Library Class
+
+| Method                                       | Description                                                                                                                                       |
+| :------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| assignTemplate                               | Initializes the class and sets the ID of the template script as the data source.                                                                  |
+| **Operations**                                                                                                                                                                                   |
+| AddNewFile                                   | Adds a new file or replaces an existing one within the script.                                                                                    |
+| renameFile                                   | Renames a file within the script.                                                                                                                 |
+| createBlankFile                              | Creates a new blank file within the script.                                                                                                       |
+| setCustomSource                              | Sets the content of the source in a file within the script.                                                                                       |
+| addFileToUserJson                            | Adds a file to the user's script.                                                                                                                 |
+| **General**                                                                                                                                                                                      |
+| **commit**\*                                 | Applies the pending changes made to the script.                                                                                                   |
+| drop                                         | Discards the local changes made to the script, without reverting a commit.                                                                        |
+| viewChanges                                  | Displays a list of changes that will be applied to the script upon committing.                                                                    |
+| getChanges                                   | Retrieves a list of changes that will be applied to the script upon committing.                                                                   |
+| getTemplateId                                | Retrieves the current ID of the script's template.                                                                                                |
+
+\* - makes changes the script file
 
 # Usage
 
@@ -75,7 +104,7 @@ appsscript file, json:
       {
         "userSymbol": "ScriptSync",
         "libraryId": "1nUiajCHQReVwWPq7rNAvsIcWvPptmMUSzeytnzVHDpdoxUIvuX0e_reL",
-        "version": "3"
+        "version": "4"
       }
     ]
   },
@@ -96,13 +125,8 @@ appsscript file, json:
 A sample script is as follows. This sample script copying the library to current project.
 
 ```javascript
-function deploy() {
-  const filesToCopy = ["lib_common", "lib_main", "lib_sett", "lib_types"];
-
-  for (let file of filesToCopy) {
-    const res = ScriptSync.IO_AddNewFile(file); 
-    if (!res) break;
-  }
+function samples() {
+  ScriptSync.IO_GetSamples();
 }
 ```
 
@@ -110,7 +134,7 @@ function deploy() {
   `{"template_script_id":"1nUiajCHQReVwWPq7rNAvsIcWvPptmMUSzeytnzVHDpdoxUIvuX0e_reL"}`
 
 You can set your script_id as follows:
-`ScriptSync.IO_AddNewFile(fromFile, toFile, ScriptId)`
+`ScriptSync.assignTemplate(TemplateScriptId)`
 
 You can copy the library and set the property manually or using the method (inside your library):
 
@@ -137,7 +161,7 @@ The library and your script template must be shared.
 
 # Licence
 
-[MIT](LICENCE)
+[MIT](LICENSE)
 
 <a name="author"></a>
 
@@ -150,6 +174,14 @@ If you have any questions and commissions for me, feel free to tell me.
 <a name="updatehistory"></a>
 
 # Update History
+
+- v2.0.4 (May 12, 2024)
+
+  1. Completely rewritten the library code based on classes.
+  2. Added new methods:
+     - General class methods: 4 methods of [assignTemplate](#methods_class), [commit](#methods_class), [drop](#methods_class), [viewChanges](#methods_class), [getChanges](#methods_class) and [getTemplateId](#methods_class) were added.
+     - File operations: 8 methods of [getScriptContent](#methods_class), [AddNewFile](#methods_class), [renameFile](#methods_class), [createBlankFile](#methods_class), [setCustomSource](#methods_class) and [addFileToUserJson](#methods_class) were added.
+     - [IO_GetSamples](#methods) method.
 
 - v1.0.0 (May 5, 2024)
 
