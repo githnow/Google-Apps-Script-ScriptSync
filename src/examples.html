@@ -1,0 +1,171 @@
+// <!--
+/**
+ * ScriptSync Library
+ * @version 2.0.4
+ * @description This script performs an update, 
+ * adding new files from the template project 
+ * to the current user script.
+ * @author https://t.me/sergnovi
+ * @see https://github.com/githnow
+ */
+
+/* WITH LIBRARY CONNECTED */
+
+// copy files from the library
+function UPDATER_Example_1() {
+
+  /* Initialize the template script */
+  var updater = ScriptSync.assignTemplate();
+
+  // showing the library script_id
+  console.log("Library id:", updater.getTemplateId());
+
+  // copying library files to this script
+  const filesToCopy = ["lib_common", "lib_types"];
+  for (let file of filesToCopy) {
+      updater.AddNewFile(file); 
+  }
+
+  const sliceForSource = 30;              // trim 'source' fields
+  updater.viewChanges(sliceForSource);    // shows the changes
+
+  updater.commit();  // apply the changes
+}
+
+
+
+// copy files from your template script
+function UPDATER_Example_2() {
+
+  /* Initialize your template script */
+  const script_id = "my-111-cmY0uvR_teMplATre-scRiPt1_IDaaH0sHoulD4BEoHeErReee";
+  var updater = ScriptSync.assignTemplate(script_id);
+
+  // showing your template_id
+  console.log("My template_id:", updater.getTemplateId());
+
+  // copying files in the template to this script
+  const filesToCopy = ["my_code", "my_index", "my_json"];
+  for (let file of filesToCopy) {
+    updater.AddNewFile(file); 
+  }
+
+  const ignoreErrors = true;      // optional
+  updater.commit(ignoreErrors);   // apply any changes
+
+}
+
+
+
+// copy files from your template script
+function UPDATER_Example_3() {
+
+  /* Initialize your template script */
+  const script_id = "my-111-cmY0uvR_teMplATre-scRiPt1_IDaaH0sHoulD4BEoHeErReee";
+  var updater = ScriptSync.assignTemplate(script_id);
+
+  // updating or adding the 'my_file' file FROM TEMPLATE & renaming it to script_js
+  updater.AddNewFile("my_file").renameFile("my_file", "myfile", "gs");
+
+  // creating a new file & renaming
+  updater.createBlankFile("the_code").renameFile("the_code", "code");
+
+  updater.commit();   // apply any changes
+
+}
+
+
+
+// add a custom source code to user script
+function UPDATER_Example_4() {
+
+  /* Initialize your template script */
+  const template_script_id = "my-111-cmY0uvR_teMplATre-scRiPt1_IDaaH0sHoulD4BEoHeErReee";
+  var updater = ScriptSync.assignTemplate(template_script_id);
+
+  // any working code, not that
+  const myFunc = {
+    def: function defined() {
+      console.log("hey");
+      /* Comments included too */
+      mayn.get(file) = function(file) {
+        file.attr = "active";
+        file.retr = function ret_() {
+          console.log(file.attr);
+        }
+      }
+    }
+  }
+
+  // creating a new file & renaming
+  updater.createBlankFile("the_code", "html")
+    .renameFile("the_code", "sample_code", "gs")    // optional here
+    .setCustomSource("sample_code", myFunc.def)
+    .viewChanges(30);                               // optional here
+
+
+  // waiting for interruption by user
+  Utilities.sleep(10000);
+
+
+  // apply the changes
+  const ignoreErrors = true;      // optional
+  const result = updater.commit(ignoreErrors);
+  console.log(result);
+}
+
+
+
+// add a custom source code to user script
+function UPDATER_Example_5() {
+
+  // get files in the current script
+  ScriptSync.IO_GetScriptFiles()
+
+  /* Initialize your template script */
+  const template_script_id = "my-111-cmY0uvR_teMplATre-scRiPt1_IDaaH0sHoulD4BEoHeErReee";
+  var updater = ScriptSync.assignTemplate(template_script_id);
+
+
+  const myCustomCode = "function Log() { console.log('Hey2') }";
+  const [my_new_file, ext] = ['the_code_hey', 'gs'];
+
+  // creating a new file & renaming
+  updater.createBlankFile(my_new_file, ext)
+    .setCustomSource(my_new_file, myCustomCode)
+    .viewChanges(30);
+
+
+  // waiting for interruption by user
+  Utilities.sleep(10000);
+
+
+  var result;
+
+  // no commit, no changes
+  // result = updater.commit();
+
+  console.log(result);
+}
+
+
+
+/* WITHIN LIBRARY */
+// You can use internal class methods with prefix `_`.
+// The 'lib_prototype' file is used to link to the script. 
+// Due to the fact that Apps Script does not load the desc-
+// ription of methods inside the class, we have to come up 
+// with a dynamic binding.
+function InLib_Example() {
+  const updater = assignTemplate("your-script-id");
+  updater._AddNewFile("appsscript");
+  updater._renameFile("myfile","myfile1");
+  updater._viewChanges(10);
+  /* [...] */
+}
+
+
+
+
+// thanks for watching ⭐
+// -->
