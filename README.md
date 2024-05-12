@@ -56,7 +56,7 @@ About the install of scopes using the library, this library requires manually in
 | getTemplateScriptFiles                       | Fetches a list of template files (script_id of the template is defined in the script properties, default template id is set to the library's id). |
 | assignTemplate                               | Initializes the class and sets the ID of the template script as the data source.                                                                  |
 
-\* - makes changes the script file
+\* - makes changes to the script file
 
 <a name="methods_class"></a>
 
@@ -72,13 +72,13 @@ About the install of scopes using the library, this library requires manually in
 | setCustomSource                              | Sets the content of the source in a file within the script.                                                                                       |
 | addFileToUserJson                            | Adds a file to the user's script.                                                                                                                 |
 | **General**                                                                                                                                                                                      |
-| **commit**\*                                 | Applies the pending changes made to the script.                                                                                                   |
+| **commit** *                                 | Applies the pending changes made to the script.                                                                                                   |
 | drop                                         | Discards the local changes made to the script, without reverting a commit.                                                                        |
 | viewChanges                                  | Displays a list of changes that will be applied to the script upon committing.                                                                    |
 | getChanges                                   | Retrieves a list of changes that will be applied to the script upon committing.                                                                   |
 | getTemplateId                                | Retrieves the current ID of the script's template.                                                                                                |
 
-\* - makes changes the script file
+\* - makes changes to the script file
 
 # Usage
 
