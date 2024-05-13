@@ -20,8 +20,8 @@ function getSetting_(property) {
 function setSetting_(property, value) {
   try {
     const properties = PropertiesService.getScriptProperties();
-    var settings = JSON.parse(properties.getProperty("SETTINGS")) || {};
-    var upSettings = {
+    const settings = JSON.parse(properties.getProperty("SETTINGS")) || {};
+    const upSettings = {
       ...settings,
       [property]: value
     }
