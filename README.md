@@ -248,6 +248,48 @@ function addMySource() {
 }
 ```
 
+### Sample 4: Set a specific library version in the script
+```javascript
+function updateLibraryVersion(libraryId='', libraryName='', version) {
+  const script_id = ScriptApp.getScriptId();
+  const current_script_json = ScriptSync.getScriptContent(script_id);
+  var appsscript_json = current_script_json.files.find(file => {
+      return file.name === "appsscript"
+  });
+
+  if(appsscript_json) {
+    appsscript_json = JSON.parse(appsscript_json.source);
+    var library = appsscript_json.dependencies?.libraries?.find(lib => {
+        return (
+            lib.libraryId === libraryId
+            || lib.userSymbol === libraryName
+        );
+    });
+
+    if(library) {
+      let new_version = version || Number(library.version) + 1;
+      library.version = (new_version).toString();
+      appsscript_json.source = JSON.stringify(appsscript_json, null, 2);
+      const updater = ScriptSync.assignTemplate();
+      updater.addFileToUserJson("appsscript", appsscript_json);
+      updater.viewChanges(370);
+      Utilities.sleep(20000);   // waiting for interruption by user (if needed)
+      return updater.commit();  // after, apply the changes
+    }
+  }
+  return false;
+}
+
+function do(e) {
+  // ....
+  const libraryId    = "library_script_id";
+  const libraryName  = "LibraryNameUsersDefined";
+  const updateResult = updateLibraryVersion(libraryId, libraryName);
+  console.log(updateResult);
+  //...
+}
+```
+
 # Restrictions
 
 PLEASE EXERCISE CAUTION WHEN RENAMING AND DELETING FILES!
