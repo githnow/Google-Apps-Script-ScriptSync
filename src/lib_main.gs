@@ -1,6 +1,6 @@
 /**
  * @name ScriptSync
- * @version 2.0.4
+ * @version 2.0.5
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -90,3 +90,4 @@ function IO_GetSamples() {
     ._viewChanges(10)
     ._commit(false);
 }
+
