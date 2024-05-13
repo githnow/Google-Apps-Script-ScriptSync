@@ -1,10 +1,10 @@
 /**
- * _getScriptContent
+ * getScriptContent
  * @typedef {Object} ScriptJson
  * @property {Array.<EntityFileData>} files Array of objects with information about files.
  */
 /**
- * _addFileToUserJson
+ * addFileToUserJson
  * @typedef {Object} EntityFileData
  * @property {string}   id        Unique file id.
  * @property {string}   name      User-defined file name without extension.
