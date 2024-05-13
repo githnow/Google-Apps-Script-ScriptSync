@@ -1,7 +1,7 @@
 // <!--
 /**
  * ScriptSync Library
- * @version 2.0.4
+ * @version 2.0.5
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -99,9 +99,9 @@ function UPDATER_Example_4() {
 
   // creating a new file & renaming
   updater.createBlankFile("the_code", "html")
-    .renameFile("the_code", "sample_code", "gs")    // optional here
-    .setCustomSource("sample_code", myFunc.def)
-    .viewChanges(30);                               // optional here
+    .renameFile("the_code", "sample_code", "gs")      // optional here
+    .setCustomSource("sample_code", "gs", myFunc.def)
+    .viewChanges(30);                                 // optional here
 
 
   // waiting for interruption by user
@@ -132,7 +132,7 @@ function UPDATER_Example_5() {
 
   // creating a new file & renaming
   updater.createBlankFile(my_new_file, ext)
-    .setCustomSource(my_new_file, myCustomCode)
+    .setCustomSource(my_new_file, ext, myCustomCode)
     .viewChanges(30);
 
 
