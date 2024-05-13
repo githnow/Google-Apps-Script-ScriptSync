@@ -1,6 +1,6 @@
 /**
  * ScriptSync Library
- * @version 2.0.4
+ * @version 2.0.5
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -22,7 +22,7 @@ ScriptSync.prototype.getTemplateId = function(...args) { return getTemplateId.ap
 
 
 /**
- * Undo any non-committed changes in files.
+ * Undo any non-committed changes in the instance.
  * @memberof {ScriptSync}
  * @returns {ScriptSync}
  */
@@ -34,18 +34,18 @@ ScriptSync.prototype.drop = function(...args) { return drop.apply(this,[...args]
  * ### This function makes changes to the current script file!
  * Save changes in the user script file.
  * @memberof {ScriptSync}
- * @param {boolean}   forceCommit   Whether to perform a forced commit 
- *                                  operation, even in case of errors.
+ * @param {boolean}   ignoreErrors  **optional**: Whether to perform a forced 
+ *                                  commit operation, even in case of errors.
  * @returns {boolean} Result of the function execution.
  */
-function commit(forceCommit=true) { return this._commit(...arguments) }
+function commit(ignoreErrors=true) { return this._commit(...arguments) }
 ScriptSync.prototype.commit = function(...args) { return commit.apply(this,[...args]) };
 
 
 /**
  * Get the changes in a user script file.
  * @memberof {ScriptSync}
- * @param {number}    slice_number  Trim source code for viewing.
+ * @param {number}    slice_number  **optional**: Trim source code for viewing.
  *                                  Number of characters to display.
  * @returns {Object}
  */
@@ -56,7 +56,7 @@ ScriptSync.prototype.getChanges  = function(...args) { return getChanges.apply(t
 /**
  * Shows the changes in a user script file.
  * @memberof {ScriptSync}
- * @param {number}    slice_number  Trim source code for viewing.
+ * @param {number}    slice_number  **optional**: Trim source code for viewing.
  *                                  Number of characters to display.
  * @returns {ScriptSync}
  */
@@ -68,16 +68,50 @@ ScriptSync.prototype.viewChanges = function(...args) { return viewChanges.apply(
 // ► │ ═  FILE OPERATIONS  ═ │
 // ► ╘═════════════════════════╛
 
+// *** READ ***
+/**
+ * Compares the content of two files.
+ * @memberof {ScriptSync}
+ * @param {string}    fn1           The name of the file 1 (default, in the template script).
+ * @param {string}    fn2           The name of the file 2 (default, in the user script).
+ * @param {string}    compare_to    __optional__:
+ * Defines the source for comparison:
+ * - `script` - compare files in the user script.
+ * - `template` - compare files in the template script.
+ * - (default, template file to script file)
+ * @returns {boolean} True if the contents are equal, false otherwise.
+ */
+function compareFilesByContent(fn1, fn2, compare_to) { return this._compareFilesByContent(...arguments) }
+ScriptSync.prototype.compareFilesByContent = function(...args) { return compareFilesByContent.apply(this,[...args]) };
+
+
+/**
+ * Retrieves a JSON file from a template.
+ * @memberof {ScriptSync}
+ * @param {string}    fn            The name of the Id of the script file that needs to be updated.
+ * @param {boolean}   sourceOnly    **optional**: Retrieves source only. Default - true.
+ *                                  If true, source will be marked `// No data.` if source is empty.
+ * @throws {Error}                  File was not found inside the template script.
+ * 
+ * @return {string|EntityFileData}  If `sourceOnly` is true, returns the source property of 
+ *                                  the file data. Otherwise, returns the entire file data.
+ */
+function getFileFromTemplate(fn, sourceOnly=true) { return this._jsonGetFileFromTemplate(...arguments) }
+ScriptSync.prototype.getFileFromTemplate = function(...args) { return getFileFromTemplate.apply(this,[...args]) };
+
+
 // *** WRITE ***
 /**
  * ### Description
- * Adds a new file from a template to the current script. from another third-party script.
+ * Adds a new file from a template to the current script.
  * If the file exists, it will be updated.
+ * 
+ * Sets an error flag in case of failure.
  * @memberof {ScriptSync}
  * @param {string}      fromFileName      Filename (in template script) from which the new data is copied.
- * @param {string}      [toFileName]      **optional**: Filename (in this script) to which the new data is being copied.
+ * @param {string}      toFileName        **optional**: Filename (in this script) to which the new data is being copied.
  *                                        If empty, the file name specified in the remote script is used.
- * @param {boolean}     [throwWithError]  Interrupt with an error. Default - false.
+ * @param {boolean}     throwWithError    **optional**: Interrupt with an error. Default - false.
  * @throws {Error}      If cannot add the file to user script (if 'throwWithError' is enabled).
  * @returns {ScriptSync}
  */
@@ -87,10 +121,12 @@ ScriptSync.prototype.AddNewFile = function(...args) { return AddNewFile.apply(th
 
 /**
  * Renames a file in the file object.
+ * 
+ * Sets an error flag in case of failure.
  * @memberof {ScriptSync}
  * @param {string}    fn              The name of the file to rename.
  * @param {string}    toFn            The new name of the file.
- * @param {string}    [extension]     The file extension, if it needs to be changed. \
+ * @param {string}    extension       **optional**: The file extension, if it needs to be changed. \
  *                                    (`'json'`, `'gs'` or `'html'`)
  * @returns {ScriptSync}
  */
@@ -114,7 +150,7 @@ ScriptSync.prototype.createBlankFile = function(...args) { return createBlankFil
  * Sets a custom data source for the script file.
  * @memberof {ScriptSync}
  * @param {string}    fn              Filename in the user script.
- * @param {string}    [extension]     The file extension if needed. \
+ * @param {string}    extension       **optional**: The file extension if needed. \
  *                                    (`'json'`, `'gs'` or `'html'`)
  * @param {string}    custom_source   Source code.
  * @returns {ScriptSync}
@@ -123,12 +159,32 @@ function setCustomSource(fn, extension, custom_source) { return this._setCustomS
 ScriptSync.prototype.setCustomSource = function(...args) { return setCustomSource.apply(this,[...args]) };
 
 
+/**
+ * Delete a file in the file object.
+ * @memberof {ScriptSync}
+ * @param {string}    fn              The name of the file to delete.
+ * @param {string}    extension       **optional**: The file extension, if it needs. \
+ *                                    (`'json'`, `'gs'` or `'html'`)
+ * @returns {ScriptSync}
+ */
+function deleteFile(fn, extension) { return this._deleteFile(...arguments) }
+ScriptSync.prototype.deleteFile = function(...args) { return deleteFile.apply(this,[...args]) };
+
+
 // *** ADVANCED ***
 /**
  * Set whole the source a file in the user script object.
+ * @memberof {ScriptSync}
  * @param {string}          savedFileName     The filename inside the script file that needs to be updated or added.
- * @param {EntityFileData}  newJson           The new file that will be added to target script file.
+ * @param {EntityFileData}  newJson           The new file that will be added to target script file.\
+ * __EntityFileData__:
+ *  - {string}  **id**      Unique file id.
+ *  - {string}  **name**    User-defined file name without extension.
+ *  - {string}  **type**    File type (example, `'json'`, `'server_js'` or `'html'`).
+ *  - {string}  **source**  Source-code or text content of the file.
+ * 
  * @returns {boolean}       Result of the function execution.
  */
 function addFileToUserJson(savedFileName, newJson) { return this._addFileToUserJson(...arguments) }
 ScriptSync.prototype.addFileToUserJson = function(...args) { return addFileToUserJson.apply(this,[...args]) };
+
