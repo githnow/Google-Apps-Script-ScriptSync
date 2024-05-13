@@ -1,6 +1,6 @@
 /**
  * ScriptSync Library
- * @version 2.0.4
+ * @version 2.0.5
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -10,7 +10,7 @@
 
 /**
  * Sets the ID of the template script as the data source.
- * If no ID is provided, retrieves the ID from the remote source.
+ * If no ID is provided, retrieves the ID from the library.
  * @param {string}  [template_script_id]  **optional**: Script file_id from where to copy the file.
  * Default value is defined by the library if it is empty. You can get ScriptId: `ScriptApp.getScriptId()`.
  * @returns {ScriptSync}  An instance of ScriptSync.
@@ -74,7 +74,7 @@ class ScriptSync {
     this.user_json_file =  JSON.parse(JSON.stringify(this.backup_json));
     this.changes = [];
     this.result = true;
-    LW("Changes reverted.");
+    L("Changes reverted.");
     return this;
   }
 
@@ -95,8 +95,10 @@ class ScriptSync {
         )
         : this.request(this.user_script_id, JSON.stringify(this.user_json_file))
     );
+    this.result = true;
     if (doCommit)
       L('All changes successfully applied. Reload the tab.');
+
     return doCommit;
   }
 
@@ -129,6 +131,7 @@ class ScriptSync {
     scriptContent.files = scriptFiles;
     
     return {
+        errors: !this.result,
         content: JSON.stringify(scriptContent, null, 2),
         changes: JSON.stringify(this.changes)
     };
@@ -167,11 +170,55 @@ class ScriptSync {
     return this.request(script_id);
   }
 
+  /**
+   * Compares the content of two files.
+   * @public LIB User execution
+   * @param {string}    fn1             The name of the file 1 (default, in the template script).
+   * @param {string}    fn2             The name of the file 2 (default, in the user script).
+   * @param {string}    [compare_to]    Compare into:
+   *                                    - `script` - compare files in the user script.
+   *                                    - `template` - compare files in the template script.
+   *                                    - (default, template file to script file)
+   * @returns {boolean} True if the contents are equal, false otherwise.
+   */
+  _compareFilesByContent(fn1, fn2, compare_to) {
+      let file1, file2;
+      switch (compare_to) {
+        case 'script':
+          file1 = this.user_json_file.files.find(file => file.name === fn1);
+          file2 = this.user_json_file.files.find(file => file.name === fn2);
+          break;
+        case 'template':
+          file1 = this.template_json_file.files.find(file => file.name === fn1);
+          file2 = this.template_json_file.files.find(file => file.name === fn2);
+          break;
+        default:
+          file1 = this.template_json_file.files.find(file => file.name === fn1);
+          file2 = this.user_json_file.files.find(file => file.name === fn2);
+      }
+      
+      if (!(file1 && file2)) {
+        let missingFile = !file1 ? fn1 : '';
+        missingFile += !file2 ? (missingFile ? `' and '${fn2}`: fn2) : '';
+        LE(`One or both files '${missingFile}' were not found.`);
+        L("Please use the `ScriptSync.getScriptFiles()` function to get the list of files.");
+        return false;
+      }
+      const match = file1.source === file2.source;
+      match
+        ? L(`Contents of '${fn1}' and '${fn2}' are the same.`)
+        : L(`Contents of '${fn1}' and '${fn2}' are different.`)
+
+      return match;
+  }
+
   // *** WRITE ***
   /**
    * ### Description
    * Adds a new file from a template to the current script. from another third-party script.
    * If the file exists, it will be updated.
+   * 
+   * Sets an error flag in case of failure.
    * @public LIB User execution
    * @param {string}      fromFileName      Filename (in template script) from which the new data is copied.
    * @param {string}      [toFileName]      **optional**: Filename (in this script) to which the new data is being copied.
@@ -199,9 +246,9 @@ class ScriptSync {
       LE(e.message);
     }
     
-    if (!receiverData && throwWithError) {
+    if (!receiverData) {
       this.result = false;
-      throw new Error("Data of the receiver was not found.");
+      if (throwWithError) throw new Error("Data of the receiver was not found.");
     }
 
     return this;
@@ -209,6 +256,8 @@ class ScriptSync {
 
   /**
    * Renames a file in the file object.
+   * 
+   * Sets an error flag in case of failure.
    * @public LIB User execution
    * @param {string}    fn              The name of the file to rename.
    * @param {string}    toFn            The new name of the file.
@@ -217,6 +266,7 @@ class ScriptSync {
    * @returns {ScriptSync}
    */
   _renameFile(fn, toFn, extension) {
+    if (!fn) throw new Error("Filename is not defined.");
     if (extension === 'gs') extension = 'server_js';
     const fileIndex = this.user_json_file.files.findIndex(file => {
         return file.name === toFn
@@ -240,11 +290,41 @@ class ScriptSync {
         entitiesData.name = toFn;
         entitiesData.type = extension ? extension : entitiesData.type;
       } else {
+        this.result = false;
         LW(`File '${fn}' was not found.`);
       }
     } else {
       this.result = false;
       LE(`File '${toFn}' is exists in the user script. Set a different name.`);
+    }
+
+    return this;
+  }
+
+  /**
+   * Delete a file in the file object.
+   * @public LIB User execution
+   * @param {string}    fn              The name of the file to delete.
+   * @param {string}    [extension]     The file extension, if it needs. \
+   *                                    (`'json'`, `'gs'` or `'html'`)
+   * @returns {ScriptSync}
+   */
+  _deleteFile(fn, extension) {
+    if (!fn) throw new Error("Value of 'fn' parameter is not defined.");
+    if (extension === 'gs') extension = 'server_js';
+    const fileIndex = this.user_json_file.files.findIndex(file => {
+        return file.name === fn && (extension ? file.type === extension : true)
+    });
+
+    const ext = extension ? `.${fileTypes.get(extension) || extension}` : '';
+
+    if (fileIndex !== -1) {
+        this.user_json_file.files.splice(fileIndex, 1);
+        const msg_text = `File '${fn}${ext}' will be deleted.`;
+        this.changes.push(msg_text);
+        L(msg_text);
+    } else {
+        LW(`File '${fn}${ext}' was not found.`);
     }
 
     return this;
@@ -360,19 +440,13 @@ class ScriptSync {
     return result;
   }
 
-
-  // ► ╒════════════════╕
-  // ► │ ══ PRIVATE ══ │
-  // ► ╘════════════════╛
-
   /**
    * Retrieves a JSON file from a template.
-   * @private
    * @param {string}    fn            The name of the Id of the script file that needs to be updated.
    * @param {boolean}   [sourceOnly]  **optional**: New content of the script file. Default - true.
    * @throws {Error}                  File was not found inside the template script.
    * 
-   * @return {EntityFileData|string}  If `sourceOnly` is true, returns the source property of 
+   * @return {string|EntityFileData}  If `sourceOnly` is true, returns the source property of 
    *                                  the file data. Otherwise, returns the entire file data.
    */
   _jsonGetFileFromTemplate(fn, sourceOnly=true) {
@@ -385,7 +459,6 @@ class ScriptSync {
 
     // Check if the file is found
     if (!entitiesData) {
-      this.result = false;
       throw new Error(`No such file name in the template script: '${fn}'.`);
     } else {
       if (!entitiesData.source) {
@@ -396,6 +469,11 @@ class ScriptSync {
 
     return sourceOnly ? entitiesData.source : (delete entitiesData.id, entitiesData);
   }
+
+
+  // ► ╒════════════════╕
+  // ► │ ══ PRIVATE ══ │
+  // ► ╘════════════════╛
 
   /**
    * Makes a request to a server.
@@ -436,12 +514,11 @@ class ScriptSync {
       }
       else {
           LW("Result is not ordinary. Status code:", status_code);
-          LW_(JSON.stringify(response.getContentText()));
+          LW(JSON.stringify(response.getContentText()));
       }
       this.result = this.result && false;
       return false;
   }
-
 }
 
 // for log changes
@@ -461,3 +538,4 @@ const dependencies = {
     },
   ]
 }
+
