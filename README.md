@@ -285,7 +285,7 @@ If you have any questions and commissions for me, feel free to tell me.
 
 # Update History
 
-- v2.0.5 (May 12, 2024)
+- v2.0.5 (May 13, 2024)
 
   1. Added new methods:
      - File operations: 2 methods of [deleteFile](#methods_class), [compareFilesByContent](#methods_class) and [getFileFromTemplate](#methods_class) were added.
