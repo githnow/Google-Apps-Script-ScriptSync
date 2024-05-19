@@ -1,6 +1,6 @@
 /**
  * @name ScriptSync
- * @version 2.0.5
+ * @version 2.0.6
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
