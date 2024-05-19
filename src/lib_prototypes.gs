@@ -1,6 +1,6 @@
 /**
  * ScriptSync Library
- * @version 2.0.5
+ * @version 2.0.6
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -36,6 +36,7 @@ ScriptSync.prototype.drop = function(...args) { return drop.apply(this,[...args]
  * @memberof {ScriptSync}
  * @param {boolean}   ignoreErrors  **optional**: Whether to perform a forced 
  *                                  commit operation, even in case of errors.
+ *                                  Default - true.
  * @returns {boolean} Result of the function execution.
  */
 function commit(ignoreErrors=true) { return this._commit(...arguments) }
@@ -187,4 +188,43 @@ ScriptSync.prototype.deleteFile = function(...args) { return deleteFile.apply(th
  */
 function addFileToUserJson(savedFileName, newJson) { return this._addFileToUserJson(...arguments) }
 ScriptSync.prototype.addFileToUserJson = function(...args) { return addFileToUserJson.apply(this,[...args]) };
+
+
+/**
+ * Retrieves information about a library based on its ID or user-defined name.
+ * @memberof {ScriptSync}
+ * @param {string} target         - The target environment, either '**script**' or '**template**'.
+ *                                  This determines whether to fetch information from the
+ *                                  script or the template file.
+ * @param {string} libraryId      - __Optional__: The unique identifier of the library to retrieve.
+ *                                  If provided, the function will search for a library with
+ *                                  this ID.
+ * @param {string} libraryName    - __Optional__: The user-defined name (userSymbol) of the library to retrieve.
+ *                                  If provided, the function will search for a library with
+ *                                  this user-defined name.
+ * @returns {LibraryInfo|null}    - Returns an object containing information about the library
+ *                                  if found, or null if the library is not found.
+ */
+function getLibraryInfo(target, libraryId, libraryName) { return this._getLibraryInfo(...arguments) }
+ScriptSync.prototype.getLibraryInfo = function(...args) { return getLibraryInfo.apply(this,[...args]) };
+
+
+/**
+ * Update library information.
+ * @memberof {ScriptSync}
+ * @param {LibraryInfo} libraryInfo   - A structured JSON object: `{ userSymbol: 'string', 
+ *                                      libraryId: 'string', version: 'number', 
+ *                                      developmentMode: boolean }`.\
+ *                                      It will be used to update the library information.
+ * @param {string}      libraryId     - The unique ID of the library.\
+ *                                      __Optional parameter__. If this parameter is provided, 
+ *                                      it will be used to identify the library in the update process.
+ * @param {string}      libraryName   - User-defined library name (userSymbol).\
+ *                                      __Optional parameter__. If '`libraryId`' is not provided, 
+ *                                      and this parameter is present, it will be used 
+ *                                      to identify the library in the update process.
+ * @returns {ScriptSync}                Returns an instance of ScriptSync for method chaining.
+ */
+function updateLibraryInfo(libraryInfo, libraryId, libraryName) { return this._updateLibraryInfo(...arguments) }
+ScriptSync.prototype.updateLibraryInfo = function(...args) { return updateLibraryInfo.apply(this,[...args]) };
 
