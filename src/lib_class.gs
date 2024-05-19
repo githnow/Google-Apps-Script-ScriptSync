@@ -1,6 +1,6 @@
 /**
  * ScriptSync Library
- * @version 2.0.5
+ * @version 2.0.6
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -184,11 +184,11 @@ class ScriptSync {
   _compareFilesByContent(fn1, fn2, compare_to) {
       let file1, file2;
       switch (compare_to) {
-        case 'script':
+        case TARGET.SCRIPT:
           file1 = this.user_json_file.files.find(file => file.name === fn1);
           file2 = this.user_json_file.files.find(file => file.name === fn2);
           break;
-        case 'template':
+        case TARGET.TEMPLATE:
           file1 = this.template_json_file.files.find(file => file.name === fn1);
           file2 = this.template_json_file.files.find(file => file.name === fn2);
           break;
@@ -399,6 +399,97 @@ class ScriptSync {
     return this;
   }
 
+  // *** LIBRARIES ***
+  /**
+   * Retrieves information about a library based on its ID or user-defined name.
+   * @param {string} target         - The target environment, either 'script' or 'template'.
+   *                                  This determines whether to fetch information from the
+   *                                  script or the template file.
+   * @param {string} [libraryId]    - The unique identifier of the library to retrieve.
+   *                                  If provided, the function will search for a library with
+   *                                  this ID.
+   * @param {string} [libraryName]  - The user-defined name (userSymbol) of the library to retrieve.
+   *                                  If provided, the function will search for a library with
+   *                                  this user-defined name.
+   * @returns {LibraryInfo|null}    - Returns an object containing information about the library
+   *                                  if found, or null if the library is not found.
+   */
+  _getLibraryInfo(target, libraryId, libraryName) {
+    if (target !== TARGET.TEMPLATE && target !== TARGET.SCRIPT) throw new Error("Target is not valid.");
+    if (libraryId === '' && libraryName === '') throw new Error("Value of the library is not defined.");
+    let library;
+
+    let appsscript_json = this._jsonGetFileFromScript(target, "appsscript", true, false);
+
+    if (appsscript_json !== null) {
+      try {
+        appsscript_json = JSON.parse(appsscript_json);
+        library = appsscript_json.dependencies?.libraries?.find(lib => {
+          return (
+              lib.libraryId === libraryId
+              || lib.userSymbol === libraryName
+          );
+        });
+      } catch (e) {
+        LE(e.message);
+      }
+    }
+
+    return library || null;
+  }
+
+  /**
+   * Update library information.
+   * @param {LibraryInfo} libraryInfo   - A structured JSON object: `{ userSymbol: 'string', 
+   *                                      libraryId: 'string', version: 'number', 
+   *                                      developmentMode: boolean }`.\
+   *                                      Requered parameter. It will be used to update 
+   *                                      the library information.
+   * @param {string}      [libraryId]   - The unique ID of the library.\
+   *                                      Optional parameter. If this parameter is provided, 
+   *                                      it will be used to identify the library in the update process.
+   * @param {string}      [libraryName] - User-defined library name (userSymbol).\
+   *                                      Optional parameter. If 'libraryId' is not provided, 
+   *                                      and this parameter is present, it will be used 
+   *                                      to identify the library in the update process.
+   * @returns {ScriptSync}                Returns an instance of ScriptSync for method chaining.
+   */
+  _updateLibraryInfo(libraryInfo, libraryId, libraryName) {
+    if(!libraryInfo) throw new Error("LibraryInfo is not defined.");
+    if (!libraryId && !libraryName) {
+      libraryId = libraryInfo.libraryId || "";
+    }
+
+    const fn = "appsscript";
+
+    var data = this.user_json_file.files.find(file => {
+      return file.name === fn
+    });
+
+    if (data) {
+      try {
+        var appsscript_json = JSON.parse(data.source);
+        var library = appsscript_json.dependencies?.libraries?.find(lib => {
+          return (
+              lib.libraryId === libraryId
+              || lib.userSymbol === libraryName
+          );
+        });
+        if (library) {
+          for (let key in libraryInfo) library[key] = libraryInfo[key];
+          data.source = JSON.stringify(appsscript_json, null, 2);
+          this.changes.push(`File '${fn}' will be updated.`);
+          L("File '%s' will be updated", fn);
+        }
+      } catch (e) {
+        this.result = false;
+        LE(e.message);
+      }
+    }
+
+    return this;
+  }
+
   // *** ADVANCED ***
   /**
    * Set whole the source a file in the user script object.
@@ -476,6 +567,33 @@ class ScriptSync {
   // ► ╘════════════════╛
 
   /**
+   * @private
+   * @returns {string}
+   */
+  _jsonGetFileFromScript(target, fn, sourceOnly=true, throwWithError=false ) {
+    if (!fn) throw new Error("File name is not defined.");
+    var data;
+
+    if (target === TARGET.TEMPLATE) {
+      data = this.template_json_file.files.find(file => {
+        return file.name === fn
+      });
+    }
+    else if (target === TARGET.SCRIPT) {
+      data = this.user_json_file.files.find(file => {
+        return file.name === fn
+      });
+    }
+
+    if (!data && throwWithError) {
+      throw new Error(`No such file name in the template script: '${fn}'.`);
+    }
+
+    return sourceOnly ? data?.source || null : data || null;
+  }
+
+
+  /**
    * Makes a request to a server.
    * @private
    * @param {string}        script_id   The script project's ID (script file_id).
@@ -521,6 +639,12 @@ class ScriptSync {
   }
 }
 
+// for libabries switch
+var TARGET = {
+  SCRIPT: 'script',
+  TEMPLATE: 'template'
+}
+
 // for log changes
 const fileTypes = new Map([
   ["server_js", "gs"],
@@ -538,4 +662,3 @@ const dependencies = {
     },
   ]
 }
-
