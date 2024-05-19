@@ -1,7 +1,7 @@
 // <!--
 /**
  * ScriptSync Library
- * @version 2.0.5
+ * @version 2.0.6
  * @description This script performs an update, 
  * adding new files from the template project 
  * to the current user script.
@@ -146,6 +146,77 @@ function UPDATER_Example_5() {
   // result = updater.commit();
 
   console.log(result);
+}
+
+
+
+// library changes 1
+function UPDATER_Example_6() {
+
+  // nothing to assign
+  const updater = ScriptSync.assignTemplate();
+
+  // Your Library ID
+  const library_id = "1nUiaj...";
+
+  // get library fields from this script: { "userSymbol": "ScriptSync", "libraryId": "1nUiaj...", "version": "5" }
+  var library_info = updater.getLibraryInfo("script", library_id);
+
+  // change any
+  library_info.version    = "150";                            // set a new version
+  library_info.libraryId  = "library_id-will_be_changed";     // set a new library id
+  library_info.userSymbol = "MyLIB";                          // set a new name (userSymbol)
+
+  // update library info, args: (new_library_info, old_library_id)
+  updater.updateLibraryInfo(library_info, library_id);
+
+  // displays changes
+  updater.viewChanges(680);
+
+  // save it
+  updater.commit();
+
+}
+
+
+
+// library changes 2
+function UPDATER_Example_7() {
+
+  // ===============================================================
+  // This is an example of a short version of the previous function
+  // ===============================================================
+
+
+  // * - assign your template
+  const updater = ScriptSync.assignTemplate();
+  const library_id = "the required - library id";
+
+
+  // HOW TO UPDATE THE VERSION ONLY
+  // --------------------------------------
+      updater.updateLibraryInfo(
+          {libraryId: library_id, version: "150"}
+      ).commit();
+
+      // OR 
+
+      // get (from template*) & update with saving (in the script)
+      updater.updateLibraryInfo(
+          Object.assign(updater.getLibraryInfo("template", library_id), {version: "150"})
+      ).commit();
+
+
+  // HOW TO UPDATE THE LIBRARY ID &V FROM TEMPLATE SCRIPT
+  // (if library id was changed in the template)
+  // -----------------------------------------------------
+      const library_info_t = updater.getLibraryInfo("template", '', library_name);
+      const library_info_s = updater.getLibraryInfo("script", '', library_name);
+
+      updater.updateLibraryInfo(
+          library_info_t, library_info_s.libraryId
+      ).commit();
+
 }
 
 
