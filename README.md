@@ -59,6 +59,7 @@ The library and your script template must be shared.
 | getScriptFiles                               | Retrieves a list of files associated with a script based on its script_id.                                                                        |
 | getTemplateScriptFiles                       | Fetches a list of template files (script_id of the template is defined in the script properties, default template id is set to the library's id). |
 | assignTemplate                               | Initializes the class and sets the ID of the template script as the data source.                                                                  |
+| createCalleeMap                              | Generates a map representing function calls within a script, with an option to visualize it.                                                      |
 
 \* - makes changes to the script file
 
@@ -76,12 +77,16 @@ The library and your script template must be shared.
 | getChanges                                   | Retrieves a list of changes that will be applied to the script upon committing.                                                                   |
 | getTemplateId                                | Retrieves the current ID of the script's template.                                                                                                |
 | **Operations**                                                                                                                                                                                   |
-| AddNewFile                                   | Adds a new file or replaces an existing one within the script.                                                                                    |
+| AddNewFile                                   | Adds a new file from the script template to the user script, replacing any existing file with the same name.                                      |
 | renameFile                                   | Renames a file within the script.                                                                                                                 |
 | deleteFile                                   | Deletes a file from the script file object.                                                                                                       |
 | compareFilesByContent                        | Compares the content of two files and returns true if they are identical, false otherwise.                                                        |
 | createBlankFile                              | Creates a new blank file within the script.                                                                                                       |
 | setCustomSource                              | Sets the content of the source in a file within the script.                                                                                       |
+| **Appsscript**                                                                                                                                                                                   |
+| getLibraryInfo                               | Retrieves information about a library from the user script or template.                                                                           |
+| updateLibraryInfo                            | Updates library information in the user script file.                                                                                              |
+| **Additional**                                                                                                                                                                                   |
 | addFileToUserJson                            | Adds a file to the user's script.                                                                                                                 |
 | getFileFromTemplate                          | Retrieves a file from the template script file object.                                                                                            |
 
@@ -111,7 +116,7 @@ appsscript file, json:
       {
         "userSymbol": "ScriptSync",
         "libraryId": "1nUiajCHQReVwWPq7rNAvsIcWvPptmMUSzeytnzVHDpdoxUIvuX0e_reL",
-        "version": "5"
+        "version": "6"
       }
     ]
   },
@@ -290,6 +295,20 @@ function do(e) {
 }
 ```
 
+### Sample 5: Set a specific library version in the script with updateLibraryInfo() method
+```javascript
+function updateLibraryVersion() {
+  // assign the template
+  const updater = ScriptSync.assignTemplate();
+  const library_id = "your_library_id";
+
+  updater.updateLibraryInfo(
+      {libraryId: library_id, version: "5"}
+  ).commit();
+}
+```
+
+
 # Restrictions
 
 PLEASE EXERCISE CAUTION WHEN RENAMING AND DELETING FILES!
@@ -326,6 +345,12 @@ If you have any questions and commissions for me, feel free to tell me.
 <a name="updatehistory"></a>
 
 # Update History
+
+- v2.0.6 (May 19, 2024)
+
+  1. Added new methods:
+     - File operations: 2 methods of [getLibraryInfo](#methods_class) and [updateLibraryInfo](#methods_class) were added.
+     - [createCalleeMap](#methods) method.
 
 - v2.0.5 (May 13, 2024)
 
