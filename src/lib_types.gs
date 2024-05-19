@@ -17,3 +17,11 @@
  * @property {string}   name      User-defined file name without extension.
  * @property {string}   type      File type (example, `'json'`, `'server_js'` or `'html'`).
  */
+/**
+ * Library Info
+ * @typedef {Object} LibraryInfo
+ * @property {string}   userSymbol        User-defined library name.
+ * @property {string}   libraryId         The unique library ID.
+ * @property {string}   version           Version of the library.
+ * @property {string}   developmentMode   The flag of development mode.
+ */
